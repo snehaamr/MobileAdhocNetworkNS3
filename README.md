@@ -124,18 +124,7 @@ These statistics are printed periodically during the simulation.
 Packet Loss Analysis:
 
 By varying the buffer size, you can analyze the effect of buffer overflow on packet loss. Nodes with larger buffers can store more packets and reduce the probability of packet loss, while nodes with smaller buffers may experience higher packet loss.
-Directory Structure:
-graphql
-Copy code
-.
-├── README.md                     # This README file
-├── src/
-│   ├── TreeStructureApp.cc        # Application logic for tree structure
-│   ├── TreeStructureApp.h         # Header for TreeStructureApp class
-│   ├── MobileAdhocTree.h          # Structure to hold node-specific information (e.g., ID, parent, hop count)
-│   └── main.cc                    # Main simulation entry point
-└── build/                         # Output directory for the compiled simulation
-Dependencies:
+
 This project uses the ns-3 simulator, which is an open-source discrete-event network simulator for research and educational use. The following modules are required:
 
 core-module
