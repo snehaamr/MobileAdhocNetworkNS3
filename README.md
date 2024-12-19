@@ -138,20 +138,15 @@ Install ns-3: If you haven't installed ns-3 yet, follow the installation instruc
 
 Clone this repository: Clone the repository to your local machine:
 
-bash
-Copy code
+
 git clone https://github.com/your-repo/ns3-buffer-simulation.git
 cd ns3-buffer-simulation
 Build the Simulation: Once you've cloned the repository, build the simulation using ns-3's build system:
 
-bash
-Copy code
 ./waf configure
 ./waf build
 Run the Simulation: You can run the simulation with a specified number of nodes and buffer size:
 
-bash
-Copy code
 ./waf --run "simulation --nWifi=40 --bufferSize=10"
 --nWifi=<num>: Number of nodes in the simulation (default: 40).
 --bufferSize=<size>: Size of the buffer at each node (default: 10 packets).
