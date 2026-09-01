@@ -2,6 +2,7 @@
 
 #include "MobileAdhocTree.h"
 
+#include "ns3/double.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4.h"
 #include "ns3/log.h"

@@ -19,6 +19,8 @@ set(header_files
     WiFiNetworkSetup.h
 )
 
+get_filename_component(scratch_dir_name ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
 build_exec(
     EXECNAME mobile-adhoc-tree
     SOURCE_FILES ${source_files}
@@ -29,4 +31,5 @@ build_exec(
                       ${libwifi}
                       ${libmobility}
                       ${libapplications}
+    EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/${scratch_dir_name}
 )
