@@ -31,5 +31,6 @@ build_exec(
                       ${libwifi}
                       ${libmobility}
                       ${libapplications}
+                      ${libflow-monitor}
     EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/${scratch_dir_name}
 )

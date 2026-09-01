@@ -21,9 +21,15 @@ Requires **ns-3.40 or later** (CMake / `./ns3`). Older `waf` trees and APIs such
 | Sent | Data packets this node unicast to its parent |
 | Delivered | Data packets received **at the root** (0 on non-root nodes) |
 | Dropped | Originated or forwarded packets discarded because the buffer was full |
+| Unique | Distinct originator+seq packets received at the root |
 | PDR | Root deliveries / total originated |
+| Unique PDR | Unique root deliveries / total originated |
+| FlowMonitor unicast lost | IP-level unicast packets that never arrived (collisions, range, queue) |
+| Buffer dropped | Application overflow only — not wireless loss |
 
-Time series are written to CSV (`simTime,nodeId,parent,hopcount,originated,sent,delivered,dropped,bufferOccupancy`). A table and aggregate PDR are printed when the simulation stops.
+Time series are written to CSV (`simTime,nodeId,parent,hopcount,originated,sent,delivered,dropped,bufferOccupancy`). A table, aggregate PDR, FlowMonitor unicast counters, and a `SUMMARY` line are printed when the simulation stops. Optional XML goes to `--flowmon`.
+
+Larger buffers should cut **bufferDropped**. They should not zero out **flowUnicastLost** if the channel is congested or the tree is partitioned.
 
 ## Build
 
@@ -34,6 +40,7 @@ git clone https://github.com/snehaamr/MobileAdhocNetworkNS3.git
 cd ns-3-dev   # your ns-3 source tree
 ln -s /path/to/MobileAdhocNetworkNS3 scratch/mobile-adhoc-tree
 ./ns3 configure --enable-examples
+# If you use --enable-modules, include flow-monitor (needed for MAC/IP loss stats).
 ./ns3 build
 ```
 
@@ -59,12 +66,24 @@ Useful arguments:
 | `--txPower` | 20 | PHY transmit power (dBm) |
 | `--seed` / `--run` | 1 / 1 | `RngSeed` / `RngRun` for repeatable trials |
 | `--csv` | `manet-stats.csv` | Time-series output path |
+| `--flowmon` | `flowmon.xml` | FlowMonitor XML (`""` skips the file) |
 
 Example: compare buffer sizes (same seed):
 
 ```bash
 ./ns3 run "mobile-adhoc-tree --bufferSize=2 --seed=1 --csv=buf2.csv"
 ./ns3 run "mobile-adhoc-tree --bufferSize=20 --seed=1 --csv=buf20.csv"
+```
+
+Or sweep `bufferSize` × `nWifi` (writes `sweep-out/sweep-summary.csv`):
+
+```bash
+python3 scratch/mobile-adhoc-tree/scripts/sweep_buffers.py \
+  --ns3 . \
+  --sim-time 30 \
+  --buffers 2,10,20 \
+  --nodes 10,20 \
+  --outdir sweep-out
 ```
 
 Larger buffers should reduce overflow drops at busy parents; they do not remove wireless collisions or partitions. Nodes that never hear a beacon stay disconnected (`parent = -1`, hop count printed as `-1`).
@@ -78,6 +97,7 @@ Larger buffers should reduce overflow drops at busy parents; they do not remove 
 | `TreeStructureApp.*` | Beacons, parent selection, buffer, unicast toward parent |
 | `MobileAdhocTree.*` | Packed ns-3 `Header` for beacons and data |
 | `CMakeLists.txt` | Scratch executable definition |
+| `scripts/sweep_buffers.py` | Parameter sweep → `sweep-summary.csv` |
 
 ## Customization
 
@@ -88,5 +108,4 @@ Larger buffers should reduce overflow drops at busy parents; they do not remove 
 ## Future work
 
 - Additional topologies (mesh, grid) and routing (AODV/OLSR vs this custom tree).
-- MAC/PHY loss via FlowMonitor so buffer drops can be separated from collisions.
-- Parameter-sweep scripts over `bufferSize` × `nWifi`.
+- NetAnim traces and optional PCAP dumps.

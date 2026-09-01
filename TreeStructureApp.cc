@@ -41,6 +41,7 @@ TreeStructureApp::TreeStructureApp()
       m_packetsSent(0),
       m_packetsDropped(0),
       m_packetsDelivered(0),
+      m_uniqueDelivered(0),
       m_nextSeq(0),
       m_nodeId(-1),
       m_parentId(-1),
@@ -119,6 +120,12 @@ uint32_t
 TreeStructureApp::GetPacketsDelivered() const
 {
     return m_packetsDelivered;
+}
+
+uint32_t
+TreeStructureApp::GetUniqueDelivered() const
+{
+    return m_uniqueDelivered;
 }
 
 uint32_t
@@ -394,7 +401,13 @@ TreeStructureApp::HandleData(Ptr<Packet> packetWithHeader)
 {
     if (m_nodeId == kRootId)
     {
+        MobileAdhocTree hdr;
+        packetWithHeader->PeekHeader(hdr);
         m_packetsDelivered++;
+        if (m_seenAtRoot.insert(std::make_pair(hdr.GetOriginator(), hdr.GetSeq())).second)
+        {
+            m_uniqueDelivered++;
+        }
         return;
     }
 

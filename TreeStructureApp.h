@@ -14,7 +14,9 @@
 #include <cstdint>
 #include <fstream>
 #include <queue>
+#include <set>
 #include <string>
+#include <utility>
 
 namespace ns3 {
 
@@ -36,6 +38,7 @@ class TreeStructureApp : public Application
     uint32_t GetPacketsOriginated() const;
     uint32_t GetPacketsSent() const;
     uint32_t GetPacketsDelivered() const;
+    uint32_t GetUniqueDelivered() const;
     uint32_t GetPacketsDropped() const;
     int32_t GetNodeId() const;
     int32_t GetParentId() const;
@@ -65,7 +68,9 @@ class TreeStructureApp : public Application
     uint32_t m_packetsSent;
     uint32_t m_packetsDropped;
     uint32_t m_packetsDelivered;
+    uint32_t m_uniqueDelivered;
     uint32_t m_nextSeq;
+    std::set<std::pair<int32_t, uint32_t>> m_seenAtRoot;
 
     int32_t m_nodeId;
     int32_t m_parentId;

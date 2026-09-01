@@ -6,6 +6,8 @@ cmake-build-*/
 *.log
 *.out
 manet-stats.csv
+flowmon.xml
+sweep-out/
 .DS_Store
 *.o
 *.swp
