@@ -1,38 +1,96 @@
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/applications-module.h"
+#ifndef TREE_STRUCTURE_APP_H
+#define TREE_STRUCTURE_APP_H
+
 #include "MobileAdhocTree.h"
+
+#include "ns3/application.h"
+#include "ns3/event-id.h"
+#include "ns3/ipv4-address.h"
+#include "ns3/nstime.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
+#include "ns3/socket.h"
+
+#include <cstdint>
+#include <fstream>
+#include <queue>
+#include <string>
 
 namespace ns3 {
 
-class TreeStructureApp : public Application 
+class TreeStructureApp : public Application
 {
-public:
-    TreeStructureApp (Ptr<Socket> socket, uint32_t bufferSize);
-    virtual ~TreeStructureApp();
-    
-    void StartApplication(void) override;
-    void StopApplication(void) override;
-    void SendPacket(void);
+  public:
+    static TypeId GetTypeId();
+
+    TreeStructureApp();
+    TreeStructureApp(Ptr<Socket> socket, uint32_t bufferSize);
+    ~TreeStructureApp() override;
+
+    void Configure(Ptr<Socket> socket, uint32_t bufferSize);
+    void SetIntervals(double sendInterval, double txInterval, double heartbeatInterval);
+    void SetStatsInterval(double statsInterval);
+
+    static void EnableCsv(const std::string& path);
+
+    uint32_t GetPacketsOriginated() const;
+    uint32_t GetPacketsSent() const;
+    uint32_t GetPacketsDelivered() const;
+    uint32_t GetPacketsDropped() const;
+    int32_t GetNodeId() const;
+    int32_t GetParentId() const;
+    int32_t GetHopcount() const;
+    uint32_t GetBufferOccupancy() const;
+
+  private:
+    void StartApplication() override;
+    void StopApplication() override;
+
+    void GenerateTraffic();
+    void Transmit();
+    void Heartbeat();
     void ReceivePacket(Ptr<Socket> socket);
-    void Heartbeat(void);
+    void PrintData();
+    void CancelEvents();
+    void RefreshPosition();
+    void CheckParentTimeout();
+    void HandleBeacon(const MobileAdhocTree& hdr, const Address& from);
+    void HandleData(Ptr<Packet> packetWithHeader);
+    void FillHeader(MobileAdhocTree& hdr, uint8_t type) const;
+    Ipv4Address GetLocalAddress() const;
 
-    void PrintData(void);
-
-private:
     Ptr<Socket> m_socket;
-    uint32_t m_packetSize;
-    uint32_t m_bufferSize;  // Buffer size (max number of packets)
+    uint32_t m_bufferSize;
+    uint32_t m_packetsOriginated;
     uint32_t m_packetsSent;
-    uint32_t m_packetsDropped;  // Track dropped packets
-    uint32_t m_packetsDelivered;  // Track delivered packets
+    uint32_t m_packetsDropped;
+    uint32_t m_packetsDelivered;
+    uint32_t m_nextSeq;
 
-    std::queue<Ptr<Packet>> m_packetBuffer;  // Queue to simulate packet buffer
-    MobileAdhocTree payload;
-    MobileAdhocTree parent_payload;
+    int32_t m_nodeId;
+    int32_t m_parentId;
+    int32_t m_hopcount;
+    Ipv4Address m_localAddress;
+    Ipv4Address m_parentAddress;
+    Time m_lastParentBeacon;
+
+    double m_sendInterval;
+    double m_txInterval;
+    double m_heartbeatInterval;
+    double m_statsInterval;
+
+    std::queue<Ptr<Packet>> m_packetBuffer;
 
     EventId m_sendEvent;
+    EventId m_txEvent;
+    EventId m_heartbeatEvent;
+    EventId m_statsEvent;
     bool m_running;
+
+    static std::ofstream s_csv;
+    static bool s_csvHeaderWritten;
 };
 
 } // namespace ns3
+
+#endif // TREE_STRUCTURE_APP_H
