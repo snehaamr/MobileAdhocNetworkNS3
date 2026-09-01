@@ -1,25 +1,30 @@
 #ifndef WIFI_NETWORK_SETUP_H
 #define WIFI_NETWORK_SETUP_H
 
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/wifi-module.h"
-#include "ns3/mobility-module.h"
+#include "ns3/net-device-container.h"
+#include "ns3/node-container.h"
+
+#include <cstdint>
 
 namespace ns3 {
 
-class WiFiNetworkSetup {
-public:
-    WiFiNetworkSetup(uint32_t numNodes, double txPower = 20);
+class WiFiNetworkSetup
+{
+  public:
+    WiFiNetworkSetup(uint32_t numNodes, double txPower = 20.0, double areaSize = 480.0);
+
     void SetupWiFi();
     void SetupMobility();
-    NodeContainer GetNodes() const;
 
-private:
-    uint32_t nWifi;
-    double txPower;
-    NodeContainer wifiStaNodes;
-    NetDeviceContainer staDevices;
+    NodeContainer GetNodes() const;
+    NetDeviceContainer GetDevices() const;
+
+  private:
+    uint32_t m_nWifi;
+    double m_txPower;
+    double m_areaSize;
+    NodeContainer m_wifiStaNodes;
+    NetDeviceContainer m_staDevices;
 };
 
 } // namespace ns3

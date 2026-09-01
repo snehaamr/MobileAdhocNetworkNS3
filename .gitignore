@@ -1,0 +1,11 @@
+build/
+cmake-cache/
+cmake-build-*/
+.ns3rc
+*.pcap
+*.log
+*.out
+manet-stats.csv
+.DS_Store
+*.o
+*.swp
